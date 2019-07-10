@@ -1,0 +1,1104 @@
+#define FASTLED_ALLOW_INTERRUPTS 0
+#include <FastLED.h>
+
+#define LED_PIN     17   // which pin your pixels are connected to
+#define NUM_LEDS   124
+#define NUM_ROWS    9     // how many rows of lights
+#define ROW         14    // how many LEDs in a row
+#define BRIGHTNESS 200   // 0-255, higher number is brighter. 
+#define SATURATION 255   // 0-255, 0 is pure white, 255 is fully saturated color
+#define SPEED       80// How fast the colors move.  Higher numbers = faster motion
+#define STEPS        1   // How wide the bands of color are.  1 = more like a gradient, 10 = more like stripes
+#define BUTTON_PIN   7   // button is connected to pin 2 and GND
+
+#define COLOR_ORDER GRB  // Try mixing up the letters (RGB, GBR, BRG, etc) for a whole new world of color combinations
+
+DEFINE_GRADIENT_PALETTE( full1 ) {
+    0,   7,128, 95,
+   30,   8,  9, 35,
+   51,  21, 24, 25,
+   66,  77, 55, 96,
+   84, 255,255,125,
+  101,  45, 39,  4,
+  122, 224, 45,144,
+  137,  82,  1, 34,
+  160,  39, 47, 35,
+  175, 155, 99, 91,
+  204,   4, 10, 21,
+  224,   5, 66, 68,
+  255,  75,166, 78};
+
+DEFINE_GRADIENT_PALETTE( full2 ) {
+    0, 234,231,  1,
+   15, 171, 43,  6,
+   40, 121,  0,  0,
+   53,  95,  1, 29,
+   71,  73,  1,168,
+   94,  38, 63,221,
+  109, 115, 51,221,
+  127,  38, 63,221,
+  147,  73,  1,168,
+  181, 203, 28,  1,
+  193, 155, 16, 11,
+  216,  73,  1,168,
+  255,   1,  4, 29};
+
+DEFINE_GRADIENT_PALETTE( full3 ) {
+    0, 255,146,228,
+   25, 152, 43, 65,
+   48,  36, 17, 22,
+   72,   8, 34, 75,
+   81,   1, 58,170,
+  104,  42, 49,245,
+  124,  15, 15, 95,
+  150,   1,  8, 39,
+  175,  98, 32, 35,
+  204, 123,  9,  2,
+  219, 220, 15,  2,
+  237, 255, 93,  6,
+  255, 244,244,  0};
+
+DEFINE_GRADIENT_PALETTE( full4 ) {
+    0, 188,108, 43,
+   63,  53,  8,  1,
+  127,  31, 53, 30,
+  191,   1,  1,  7,
+  255, 139, 60, 25};
+  
+DEFINE_GRADIENT_PALETTE( full5 ) {
+    0, 107,115, 74,
+   84, 142, 65,106,
+  168,   7, 45, 42,
+  255,   1, 20, 48};
+  
+DEFINE_GRADIENT_PALETTE( full6 ) {
+    0,  65, 37,  1,
+  127,   2, 27,  2,
+  255,   1, 11, 14};
+
+DEFINE_GRADIENT_PALETTE( full7 ) {
+    0,   2,184,188,
+   33,  56, 27,162,
+   66,  56, 27,162,
+  122, 255,255, 45,
+  150, 227, 65,  6,
+  201,  67, 13, 27,
+  255,  16,  1, 53};
+
+DEFINE_GRADIENT_PALETTE( full8 ) {
+   0,  14,  2, 10,
+   35,   6, 47, 49,
+   96,  83,201, 23,
+  153,  92,151,182,
+  209,  15, 72,153,
+  255,  60, 48, 99};
+
+DEFINE_GRADIENT_PALETTE( full9 ) {
+    0,   1,  4,  1,
+   12,   1, 28,  2,
+   28,  16, 68, 11,
+   58,  18, 11, 28,
+   79,  31, 27, 48,
+   96,   2, 13, 34,
+  117,  30, 86,123,
+  135,   2, 42, 62,
+  153,  74,128,155,
+  181,  60, 31, 41,
+  214, 167,211,223,
+  237, 179, 70, 78,
+  255,  57,  2,  7};
+
+DEFINE_GRADIENT_PALETTE( full10 ) {
+  0,   9, 32, 35,
+  255,5,  5,  5};
+
+DEFINE_GRADIENT_PALETTE( full11 ) {
+    0,   2,  5, 11,
+   30,  12, 10, 87,
+   48,  61,124,201,
+   63,  10, 54,111,
+   81,   1,  8, 68,
+  117,  88, 84,247,
+  145,   1, 12,  9,
+  175,  61,130, 43,
+  196,  31,146,  6,
+  234,   4, 31, 10,
+  255,   0,  1,  1};
+
+
+DEFINE_GRADIENT_PALETTE( fire1 ) {
+    0,   0,  0,  0,
+   63,  42,  0,  0,
+  127, 255,  0,  0,
+  191, 255, 55,  0,
+  255, 255,255,  0};
+
+DEFINE_GRADIENT_PALETTE( fire2 ) {
+    0, 184, 56,  1,
+   35, 184,121,  1,
+   51, 184, 56,  1,
+   52,   1,  1,  1,
+   62,   1,  1,  1,
+   62, 239,241,240,
+   76, 239,241,240,
+   77, 184, 15,  1,
+  102, 184, 15,  1,
+  103, 239,241, 34,
+  126, 184, 15,  1,
+  127, 184,121,  1,
+  153, 184, 15,  1,
+  154, 239,241, 34,
+  179, 184, 15,  1,
+  180, 184,121,  1,
+  205, 184, 15,  1,
+  206, 239,241, 34,
+  230, 184, 15,  1,
+  232, 184,121,  1,
+  255, 184, 15,  1};
+
+
+DEFINE_GRADIENT_PALETTE( aurora ) {
+    0,   7, 22,  1,
+   40,  16, 31,  1,
+   73,  61,101,  1,
+  109,   5, 19,  1,
+  168, 113,139,  1,
+  244,   8, 28,  1,
+  255,   8, 28,  1};
+  
+DEFINE_GRADIENT_PALETTE( aurora2 ) {
+    0,   1, 22,  1,
+  130,   1,168,  2,
+  255,   1, 22,  1};
+
+DEFINE_GRADIENT_PALETTE( aurora3 ) {
+    0,   2,  5, 11,
+   30,  12, 10, 87,
+   48,  61,124,201,
+   63,  10, 54,111,
+   81,   1,  8, 68,
+  117,  88, 84,247,
+  145,   1, 12,  9,
+  175,  61,130, 43,
+  196,  31,146,  6,
+  234,   4, 31, 10,
+  255,   0,  1,  1};
+  
+DEFINE_GRADIENT_PALETTE( aurora4 ) {
+    0,  29,112,205,
+   48,  92,255,250,
+   91,  52,223, 12,
+  124,   4, 13, 21,
+  183,   9,103, 15,
+  216,  10, 80,  2,
+  255,  38,255, 52};
+
+
+
+  
+DEFINE_GRADIENT_PALETTE(off) {
+    0,  0,  0,  0,
+    0,  0,  0,  0,
+    0,  0,  0,  0,
+    0,  0,  0,  0,
+    0,  0,  0,  0,
+    0,  0,  0,  0,
+    0,  0,  0,  0};
+
+
+DEFINE_GRADIENT_PALETTE( green ) {
+0,   0, 12,  0,
+61, 153,239,112,
+127,   0, 12,  0,
+165, 106,239,  2,
+196, 167,229, 71,
+229, 106,239,  2,
+255,   0, 12,  0};
+
+DEFINE_GRADIENT_PALETTE( sky1 ) {
+    0, 244,156, 46,
+  127, 255,231, 69,
+  255, 255,227,156};
+
+
+DEFINE_GRADIENT_PALETTE( sky4 ) {
+    0,   1, 10, 19,
+  132, 126,201,255,
+  255,   1, 10, 19};
+
+DEFINE_GRADIENT_PALETTE( peak4 ) {
+    0, 252,255,102,
+  255, 155,213,250};
+
+DEFINE_GRADIENT_PALETTE( mountain4 ) {
+    0,   1,  8, 87,
+   71,  23,195,130,
+  122, 186,248,233,
+  168,  23,195,130,
+  255,   1,  8, 87};
+
+DEFINE_GRADIENT_PALETTE( base4 ) {
+    0,   0,  0,  0,
+   39,   7, 55,  8,
+   99,  42,255, 45,
+  153,   7, 55,  8,
+  255,   0,  0,  0};
+
+DEFINE_GRADIENT_PALETTE( farhill4 ) {
+    0,   1, 55,  1,
+  130, 255,255,  8,
+  255,  42, 55,  0};
+
+DEFINE_GRADIENT_PALETTE( midhill4 ) {
+    0,   1, 22,  1,
+  130,   1,168,  2,
+  255,   1, 22,  1};
+
+DEFINE_GRADIENT_PALETTE( closehill4 ) {
+    0,   1, 33, 95,
+   38,   1,107, 37,
+   76,  42,255, 45,
+  127, 255,255, 45,
+  178,  42,255, 45,
+  216,   1,107, 37,
+  255,   1, 33, 95};
+
+DEFINE_GRADIENT_PALETTE( trees4 ) {
+    0, 109,252,125,
+  119,   7,255,  8,
+  255,   1, 23,  1};
+
+DEFINE_GRADIENT_PALETTE( sky5 ) {
+    0,  66, 26, 30,
+   63,  32, 44, 63,
+  127, 182, 48,  8,
+  191, 125,109,115,
+  255, 213,246, 37};
+
+DEFINE_GRADIENT_PALETTE( peak5 ) {
+    0,  67, 42, 33,
+   63, 229, 53, 19,
+  127, 247, 85, 25,
+  191, 249,168, 11,
+  255, 239,225, 22};
+
+DEFINE_GRADIENT_PALETTE( mountain5 ) {
+    0,  27, 15, 37,
+  127,   4,  6, 37,
+  255,   1, 35,  5};
+
+DEFINE_GRADIENT_PALETTE( base5 ) {
+    0,   7, 11, 41,
+  255,   1, 18, 36};
+
+DEFINE_GRADIENT_PALETTE( farhill5 ) {
+    0,   9, 32, 35,
+  255,   1,  1,  5};
+
+DEFINE_GRADIENT_PALETTE( midhill5 ) {
+    0,   4, 35, 24,
+  255,  12, 74, 26};
+
+DEFINE_GRADIENT_PALETTE( closehill5 ) {
+    0,   1,  1, 37,
+  255,   1, 25,  1};
+
+DEFINE_GRADIENT_PALETTE( trees5 ) {
+    0,   1, 19, 16,
+  255, 165, 95,  0};
+
+
+  
+
+
+CRGB leds[NUM_LEDS];
+CRGBPalette16 currentPalette;
+CRGBPalette16 targetPalette( PartyColors_p );
+TBlendType    currentBlending;
+int ledMode = 1;
+
+
+//FastLED comes with several palettes pre-programmed.  I like purple a LOT, and so I added a custom purple palette.
+
+
+
+    
+unsigned long keyPrevMillis = 0;
+const unsigned long keySampleIntervalMs = 25;
+byte longKeyPressCountMax = 80;    // 80 * 25 = 2000 ms
+byte longKeyPressCount = 0;
+byte caseCount = 8;               // change to number of cases-1 / highest case number in switch statemenet inside loop()
+byte prevKeyState = HIGH;         // button is active low
+
+void setup() {
+  // put your setup code here, to run once:
+  delay( 2000 ); // power-up safety delay
+  FastLED.addLeds<WS2812, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.setBrightness(  BRIGHTNESS );
+  currentBlending =LINEARBLEND;
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+}
+
+uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+
+  byte currKeyState = digitalRead(BUTTON_PIN);
+
+  if ((prevKeyState == LOW) && (currKeyState == HIGH)) {
+    shortKeyPress();
+  }
+  prevKeyState = currKeyState;
+
+  static uint8_t startIndex = 0;
+  startIndex = startIndex + 1; /* motion speed */
+
+  switch (ledMode) {
+    //this is the switch that is controlled by the button. create new functions like multipalette() and call in the case. make sure to update casecount above.
+  case 0:
+    scene1(startIndex);
+    break;
+  case 1:
+    scene2(startIndex);
+    break;
+  case 2:  
+    scene3(startIndex);
+    break;
+  case 3:
+    scene4(startIndex);
+    break;
+  case 4:
+    scene5(startIndex);
+    break;
+  case 5:
+    scene6(startIndex);
+    break;
+  case 6:
+    scene7(startIndex);
+    break;
+  case 7:
+    scene8(startIndex);
+    break;
+  case 8:
+    scene9(startIndex);
+    break;
+  } 
+
+  
+  FastLED.show();
+  FastLED.delay(1000 / SPEED);  
+}
+
+void confetti() 
+{
+  // random colored speckles that blink in and fade smoothly
+  fadeToBlackBy( leds, NUM_LEDS, 1);
+  int pos = random8(10);
+  leds[pos] = CHSV( random8(32), 255, 200);
+  //FastLED.setBrightness(  BRIGHTNESS );
+}
+
+
+void scene1(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      switch(i){
+         case 0: //back row
+            switchPalette=green;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=green;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=green;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 3:
+          switchPalette=green;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=green;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 5:
+          switchPalette=green;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 6:
+          switchPalette=green;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=green; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          else
+          {
+            switchPalette=green;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=green;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=green;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+void scene2(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      switch(i){
+         case 0: //back row
+            switchPalette=full8;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=full8;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=full8;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 3:
+          switchPalette=full8;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=full8;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 5:
+          switchPalette=full8;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 6:
+          switchPalette=full8;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=full8; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          else
+          {
+            switchPalette=full8;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=full8;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=full8;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+void scene3(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      switch(i){
+         case 0: //back row
+            switchPalette=sky4;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=peak4;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 255, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=mountain4;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 200, currentBlending);
+          break;
+        case 3:
+          switchPalette=base4;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 150, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=farhill4;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+          break;
+        case 5:
+          switchPalette=midhill4;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+          break;
+        case 6:
+          switchPalette=closehill4;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 75, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=trees4; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 150, currentBlending);
+          }
+          else
+          {
+            switchPalette=trees4;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=trees4;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=trees4;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 150, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+void scene4(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      FastLED.setBrightness(  BRIGHTNESS );
+      switch(i){
+         case 0: //back row
+                 switchPalette=full6;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=full6;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=full6;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 3:
+          switchPalette=full6;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=full6;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 5:
+          switchPalette=full6;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 6:
+          switchPalette=full6;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=full6; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          else
+          {
+            switchPalette=full6;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=full6;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=full6;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+void scene5(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      FastLED.setBrightness(  BRIGHTNESS );
+      switch(i){
+         case 0: //back row
+         switchPalette=sky1;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 35, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=fire1;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 255, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=fire1;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+          break;
+        case 3:
+          switchPalette=fire1;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=fire1;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+          break;
+        case 5:
+          switchPalette=fire1;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+          break;
+        case 6:
+          switchPalette=fire1;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=fire1; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=fire1;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=fire1;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=fire1;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+
+void scene6(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      FastLED.setBrightness(  BRIGHTNESS );
+      switch(i){
+         case 0: //back row
+            switchPalette=full9;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=full9;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=full9;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 3:
+          switchPalette=full9;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=full9;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 5:
+          switchPalette=full9;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 6:
+          switchPalette=full9;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=full9; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          else
+          {
+            switchPalette=full9;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=full9;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=full9;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+
+void scene7(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+ 
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      FastLED.setBrightness(  BRIGHTNESS );
+      switch(i){
+         case 0: //back row
+             switchPalette=fire2;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=fire2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, BRIGHTNESS, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=fire2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+          break;
+        case 3:
+          switchPalette=fire2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=fire2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+          break;
+        case 5:
+          switchPalette=fire2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+          break;
+        case 6:
+          switchPalette=fire2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 100, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=fire2; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+          }
+          else
+          {
+            switchPalette=fire2;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=fire2;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=fire2;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 50, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+
+void scene8(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+ 
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      FastLED.setBrightness(  BRIGHTNESS );
+      switch(i){
+         case 0: //back row
+            switchPalette=aurora4;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 75, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=full10;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=full10;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 3:
+          switchPalette=full10;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=full10;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 5:
+          switchPalette=full10;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 6:
+          switchPalette=full10;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=full10; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 200, currentBlending);
+          }
+          else
+          {
+            switchPalette=full10;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=full10;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=full10;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 200, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+
+void scene9(uint8_t colorIndex){
+  CRGBPalette16 switchPalette;
+  int row;
+  for(int i=0; i<NUM_ROWS; i++){
+    row = i*ROW;
+    for(int j=0; j<ROW; j++)
+    {
+      switch(i){
+         case 0: //back row
+             switchPalette=full2;
+            leds[j] = ColorFromPalette( switchPalette, colorIndex, 75, currentBlending);
+            if(j==11)
+            {
+              j+=2;
+            }
+            ;
+            break;
+        case 1:
+          switchPalette=full3;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+            ;
+          break;
+        case 2:
+          switchPalette=full2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 3:
+          switchPalette=full3;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+             ;
+          break;
+        case 4:
+           switchPalette=full2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 5:
+          switchPalette=full3;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 6:
+          switchPalette=full2;
+          leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 125, currentBlending);
+          break;
+        case 7:
+         if(j<ROW-9)
+          {
+            switchPalette=full3; // right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 200, currentBlending);
+          }
+          else
+          {
+            switchPalette=full2;//left 
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+        case 8:  //front row
+        if(j>7)
+          {
+            switchPalette=full2;//right
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 0, currentBlending);
+          }
+          else
+          {
+            switchPalette=full2;//left
+            leds[j+row-2] = ColorFromPalette( switchPalette, colorIndex, 200, currentBlending);
+          }
+          //FastLED.setBrightness(  50 )
+
+          break;
+      }
+      colorIndex+=STEPS;
+    }
+  }
+}
+void shortKeyPress() {
+  ledMode++;
+  if (ledMode > caseCount) {
+    ledMode=0; 
+  }  
+}
